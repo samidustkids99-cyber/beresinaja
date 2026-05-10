@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PaperMart - Jual Beli Kertas</title>
+    <style>
+        /* CSS - Desain Tampilan */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* Kartu Produk */
+        .product-card {
+            background: white;
+            border-radius: 8px;
+            width: 250px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .product-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .price {
+            color: #27ae60;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Keranjang */
+        .cart-section {
+            background: #fff;
+            margin: 20px auto;
+            max-width: 800px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .total {
+            text-align: right;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📄 PaperMart</h1>
+    <p>Solusi Kertas Berkualitas untuk Kebutuhan Anda</p>
+</header>
+
+<div class="container" id="product-list">
+    </div>
+
+<div class="cart-section">
+    <h2>🛒 Keranjang Belanja</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Produk</th>
+                <th>Harga</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="cart-items">
+            </tbody>
+    </table>
+    <div class="total"> Total: Rp <span id="total-price">0</span></div>
+    <button onclick="checkout()" style="background-color: #27ae60;">Checkout Sekarang</button>
+</div>
+
+<script>
+    // JS - Data Produk
+    const products = [
+        { id: 1, name: "Kertas A4 80gr", price: 55000, img: "https://images.unsplash.com/photo-1589739900243-4b52cd9b104e?w=250" },
+        { id: 2, name: "Kertas Foto Glossy", price: 35000, img: "https://images.unsplash.com/photo-1603484477859-abe6a73f9366?w=250" },
+        { id: 3, name: "Kertas Karton Manila", price: 5000, img: "https://images.unsplash.com/photo-1517842645767-c639042777db?w=250" },
+        { id: 4, name: "Kertas Kado Estetik", price: 15000, img: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=250" }
+    ];
+
+    let cart = [];
+
+    // Render Produk ke Layar
+    const productContainer = document.getElementById('product-list');
+    products.forEach(product => {
+        productContainer.innerHTML += `
+            <div class="product-card">
+                <img src="${product.img}" alt="${product.name}">
+                <h3>${product.name}</h3>
+                <p class="price">Rp ${product.price.toLocaleString()}</p>
+                <button onclick="addToCart(${product.id})">Tambah ke Keranjang</button>
+            </div>
+        `;
+    });
+
+    // Fungsi Tambah ke Keranjang
+    function addToCart(productId) {
+        const product = products.find(p => p.id === productId);
+        cart.push(product);
+        updateCart();
+    }
+
+    // Fungsi Hapus dari Keranjang
+    function removeFromCart(index) {
+        cart.splice(index, 1);
+        updateCart();
+    }
+
+    // Update Tampilan Keranjang & Total
+    function updateCart() {
+        const cartTable = document.getElementById('cart-items');
+        const totalDisplay = document.getElementById('total-price');
+        
+        cartTable.innerHTML = '';
+        let total = 0;
+
+        cart.forEach((item, index) => {
+            total += item.price;
+            cartTable.innerHTML += `
+                <tr>
+                    <td>${item.name}</td>
+                    <td>Rp ${item.price.toLocaleString()}</td>
+                    <td><button onclick="removeFromCart(${index})" style="background-color: #e74c3c; width: auto; padding: 5px 10px;">Hapus</button></td>
+                </tr>
+            `;
+        });
+
+        totalDisplay.innerText = total.toLocaleString();
+    }
+
+    // Fungsi Checkout
+    function checkout() {
+        if (cart.length === 0) {
+            alert("Keranjang masih kosong!");
+        } else {
+            alert("Terima kasih! Pesanan Anda telah diterima. Total: Rp " + document.getElementById('total-price').innerText);
+            cart = [];
+            updateCart();
+        }
+    }
+</script>
+
+</body>
+          </html>
+          
